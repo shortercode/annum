@@ -1,14 +1,3 @@
-export enum TemporalUnit {
-  MILLISECONDS = 0,
-  SECONDS = 1,
-  MINUTES = 2,
-  HOURS = 3,
-  DAYS = 4,
-  WEEKS = 5,
-  MONTHS = 6,
-  YEARS = 7,
-}
-
 export const MILLISECONDS_PER_MINUTE = 60000;
 export const MILLISECONDS_PER_HOUR = 3600000;
 export const MILLISECONDS_PER_DAY = 86400000;

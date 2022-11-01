@@ -1,6 +1,7 @@
 import { MILLISECONDS_PER_DAY, MILLISECONDS_PER_HOUR, MILLISECONDS_PER_MINUTE, MILLISECONDS_PER_MONTH, MILLISECONDS_PER_WEEK, MILLISECONDS_PER_YEAR, TemporalUnit } from './Duration.constants';
 import type { SplitDuration } from './Duration.type';
 import { Instant } from './Instant';
+import { TemporalUnitName } from './TemporalUnit.constants';
 
 export class Duration<T extends TemporalUnit = TemporalUnit> {
   private constructor(readonly units: T, readonly value: number) {}
@@ -21,6 +22,10 @@ export class Duration<T extends TemporalUnit = TemporalUnit> {
 
   multiply(factor: number): Duration<T> {
     return new Duration(this.units, this.value * factor);
+  }
+
+  negate(): Duration<T> {
+    return new Duration(this.units, -this.value);
   }
 
   clamp(min: Duration): Duration;
@@ -112,6 +117,19 @@ export class Duration<T extends TemporalUnit = TemporalUnit> {
     const milliseconds = Duration.Milliseconds(base);
 
     return { years, months, days, hours, minutes, seconds, milliseconds };
+  }
+
+  format (locales?: string | string[], options?: Intl.RelativeTimeFormatOptions) {
+    const formatter = new Intl.RelativeTimeFormat(locales, options);
+    const unit = TemporalUnitName[this.units]!;
+
+    // NOTE RelativeTimeFormat does not support 'millisecond' so we switch
+    // to the nearest supported unit 'second'
+    if (unit === 'millisecond') {
+      return formatter.format(this.seconds, 'second');
+    }
+
+    return formatter.format(this.value, unit);
   }
 
   toDate(offset = Duration.ZERO): Date {

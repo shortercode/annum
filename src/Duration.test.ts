@@ -1,6 +1,6 @@
 import { Duration } from './Duration';
 import sinon from 'sinon';
-import { TemporalUnit } from './Duration.constants';
+import { TemporalUnit } from './TemporalUnit.constants';
 
 function random_integer(n: number) {
   return Math.floor(n * Math.random());
