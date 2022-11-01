@@ -49,7 +49,7 @@ describe('duration', () => {
   it('Duration.ZERO', () => {
     expect(Duration.ZERO).toEqual({
       value: 0,
-      units: TemporalUnit.HOURS,
+      units: TemporalUnit.YEARS,
     });
   });
   it('Duration.FromDate(string)', () => {
