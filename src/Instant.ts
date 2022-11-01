@@ -35,7 +35,7 @@ export class Instant {
     return new Instant(result.getTime(), this.offset);
   }
 
-  change_offset (offset = Duration.ZERO): Instant {
+  change_offset (offset: Duration = Duration.ZERO): Instant {
     const value = this.value - this.offset.milliseconds + offset.milliseconds;
     return new Instant(value, offset);
   }
