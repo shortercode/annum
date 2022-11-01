@@ -1,7 +1,7 @@
-import { MILLISECONDS_PER_DAY, MILLISECONDS_PER_HOUR, MILLISECONDS_PER_MINUTE, MILLISECONDS_PER_MONTH, MILLISECONDS_PER_WEEK, MILLISECONDS_PER_YEAR, TemporalUnit } from './Duration.constants';
+import { MILLISECONDS_PER_DAY, MILLISECONDS_PER_HOUR, MILLISECONDS_PER_MINUTE, MILLISECONDS_PER_MONTH, MILLISECONDS_PER_WEEK, MILLISECONDS_PER_YEAR } from './Duration.constants';
 import type { SplitDuration } from './Duration.type';
 import { Instant } from './Instant';
-import { TemporalUnitName } from './TemporalUnit.constants';
+import { TemporalUnit, TEMPORAL_UNIT_NAME } from './TemporalUnit.constants';
 
 export class Duration<T extends TemporalUnit = TemporalUnit> {
   private constructor(readonly units: T, readonly value: number) {}
@@ -121,7 +121,7 @@ export class Duration<T extends TemporalUnit = TemporalUnit> {
 
   format (locales?: string | string[], options?: Intl.RelativeTimeFormatOptions) {
     const formatter = new Intl.RelativeTimeFormat(locales, options);
-    const unit = TemporalUnitName[this.units]!;
+    const unit = TEMPORAL_UNIT_NAME[this.units] ?? 'millisecond';
 
     // NOTE RelativeTimeFormat does not support 'millisecond' so we switch
     // to the nearest supported unit 'second'
@@ -132,35 +132,16 @@ export class Duration<T extends TemporalUnit = TemporalUnit> {
     return formatter.format(this.value, unit);
   }
 
-  toDate(offset = Duration.ZERO): Date {
-    return new Date(this.milliseconds + offset.milliseconds);
+  toDate(): Date {
+    return new Date(this.milliseconds);
   }
 
-  toInstant(offset = Duration.ZERO): Instant {
+  toInstant(offset: Duration = Duration.ZERO): Instant {
     return new Instant(this.milliseconds, offset);
   }
 
   toString(): string {
-    const units: TemporalUnit = this.units;
-
-    switch (units) {
-      case TemporalUnit.MILLISECONDS:
-        return `${this.value}ms`;
-      case TemporalUnit.SECONDS:
-        return `${this.value}s`;
-      case TemporalUnit.MINUTES:
-        return `${this.value}m`;
-      case TemporalUnit.HOURS:
-        return `${this.value}h`;
-      case TemporalUnit.DAYS:
-        return `${this.value}d`;
-      case TemporalUnit.WEEKS:
-        return `${this.value}w`;
-      case TemporalUnit.MONTHS:
-        return `${this.value}mo`;
-      case TemporalUnit.YEARS:
-        return `${this.value}y`;
-    }
+    return this.format();
   }
 
   toJSON (): { value: number; units: string } {

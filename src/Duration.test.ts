@@ -108,8 +108,6 @@ describe('duration', () => {
     const a = new Date();
     const now = Duration.Milliseconds(a.getTime());
     expect(now.toDate().getTime()).toEqual(a.getTime());
-    a.setTime(a.getTime() + 3421);
-    expect(now.toDate(3421).getTime()).toEqual(a.getTime());
   });
   it('duration.as', () => {
     const now = Duration.Milliseconds(Date.now());
