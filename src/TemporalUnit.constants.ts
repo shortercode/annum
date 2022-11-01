@@ -1,4 +1,4 @@
-export const TemporalUnitName: Array<Intl.RelativeTimeFormatUnit | 'millisecond'> = [
+export const TEMPORAL_UNIT_NAME: Array<Intl.RelativeTimeFormatUnit | 'millisecond'> = [
   'millisecond',
   'second',
   'minute',
@@ -18,4 +18,4 @@ export enum TemporalUnit {
   WEEKS = 5,
   MONTHS = 6,
   YEARS = 7,
-};
+}
