@@ -1,6 +1,7 @@
 import { Duration } from './Duration';
 import sinon from 'sinon';
 import { TemporalUnit } from './TemporalUnit.constants';
+import { WEEKS_PER_MONTH } from './Duration.constants';
 
 function random_integer(n: number) {
   return Math.floor(n * Math.random());
@@ -81,28 +82,74 @@ describe('duration', () => {
     });
   });
   it('duration.milliseconds', () => {
+    expect(Duration.Years(1).milliseconds).toEqual(31536000000);
+    expect(Duration.Months(1).milliseconds).toEqual(2592000000);
+    expect(Duration.Weeks(1).milliseconds).toEqual(604800000);
+    expect(Duration.Days(1).milliseconds).toEqual(86400000);
     expect(Duration.Hours(1).milliseconds).toEqual(3600000);
     expect(Duration.Minutes(1).milliseconds).toEqual(60000);
     expect(Duration.Seconds(1).milliseconds).toEqual(1000);
     expect(Duration.Milliseconds(1).milliseconds).toEqual(1);
   });
   it('duration.seconds', () => {
+    expect(Duration.Years(1).seconds).toEqual(31536000);
+    expect(Duration.Months(1).seconds).toEqual(2592000);
+    expect(Duration.Weeks(1).seconds).toEqual(604800);
+    expect(Duration.Days(1).seconds).toEqual(86400);
     expect(Duration.Hours(1).seconds).toEqual(3600);
     expect(Duration.Minutes(1).seconds).toEqual(60);
     expect(Duration.Seconds(1).seconds).toEqual(1);
     expect(Duration.Milliseconds(1000).seconds).toEqual(1);
   });
   it('duration.minutes', () => {
+    expect(Duration.Years(1).minutes).toEqual(525600);
+    expect(Duration.Months(1).minutes).toEqual(43200);
+    expect(Duration.Weeks(1).minutes).toEqual(10080);
+    expect(Duration.Days(1).minutes).toEqual(1440);
     expect(Duration.Hours(1).minutes).toEqual(60);
     expect(Duration.Minutes(1).minutes).toEqual(1);
     expect(Duration.Seconds(60).minutes).toEqual(1);
     expect(Duration.Milliseconds(60000).minutes).toEqual(1);
   });
   it('duration.hours', () => {
+    expect(Duration.Years(1).hours).toEqual(8760);
+    expect(Duration.Months(1).hours).toEqual(720);
+    expect(Duration.Weeks(1).hours).toEqual(168);
+    expect(Duration.Days(1).hours).toEqual(24);
     expect(Duration.Hours(1).hours).toEqual(1);
     expect(Duration.Minutes(60).hours).toEqual(1);
     expect(Duration.Seconds(3600).hours).toEqual(1);
     expect(Duration.Milliseconds(3600000).hours).toEqual(1);
+  });
+  it('duration.days', () => {
+    expect(Duration.Years(1).days).toEqual(365);
+    expect(Duration.Months(1).days).toEqual(30);
+    expect(Duration.Weeks(1).days).toEqual(7);
+    expect(Duration.Days(1).days).toEqual(1);
+    expect(Duration.Hours(24).days).toEqual(1);
+    expect(Duration.Minutes(24 * 60).days).toEqual(1);
+    expect(Duration.Seconds(24 * 60 * 60).days).toEqual(1);
+    expect(Duration.Milliseconds(24 * 60 * 60 * 1000).days).toEqual(1);
+  });
+  it('duration.weeks', () => {
+    expect(Duration.Years(1).weeks).toEqual(52);
+    expect(Duration.Months(1).weeks).toEqual(4.345);
+    expect(Duration.Weeks(1).weeks).toEqual(1);
+    expect(Duration.Days(7).weeks).toEqual(1);
+    expect(Duration.Hours(7 * 24).weeks).toEqual(1);
+    expect(Duration.Minutes(7 * 24 * 60).weeks).toEqual(1);
+    expect(Duration.Seconds(7 * 24 * 60 * 60).weeks).toEqual(1);
+    expect(Duration.Milliseconds(7 * 24 * 60 * 60 * 1000).weeks).toEqual(1);
+  });
+  it('duration.months', () => {
+    expect(Duration.Years(1).months).toBeCloseTo(12);
+    expect(Duration.Months(1).months).toEqual(1);
+    expect(Duration.Weeks(WEEKS_PER_MONTH).months).toBeCloseTo(1);
+    expect(Duration.Days(30).months).toEqual(1);
+    expect(Duration.Hours(30 * 24).months).toEqual(1);
+    expect(Duration.Minutes(30 * 24 * 60).months).toEqual(1);
+    expect(Duration.Seconds(30 * 24 * 60 * 60).months).toEqual(1);
+    expect(Duration.Milliseconds(30 * 24 * 60 * 60 * 1000).months).toEqual(1);
   });
   it('duration.toDate', () => {
     const a = new Date();
@@ -116,6 +163,10 @@ describe('duration', () => {
     expect(now.as(TemporalUnit.SECONDS)).toEqual(now.seconds);
     expect(now.as(TemporalUnit.MINUTES)).toEqual(now.minutes);
     expect(now.as(TemporalUnit.HOURS)).toEqual(now.hours);
+    expect(now.as(TemporalUnit.DAYS)).toEqual(now.days);
+    expect(now.as(TemporalUnit.WEEKS)).toEqual(now.weeks);
+    expect(now.as(TemporalUnit.MONTHS)).toEqual(now.months);
+    expect(now.as(TemporalUnit.YEARS)).toEqual(now.years);
   });
   it('duration.clamp', () => {
     expect(Duration.Seconds(10).clamp(Duration.ZERO)).toEqual({
@@ -174,4 +225,15 @@ describe('duration', () => {
       value: -58,
     });
   });
+  it.todo('duration.negate');
+  it.todo('duration.normalise');
+  it.todo('duration.split');
+  it.todo('duration.format');
+  it.todo('duration.toInstant');
+  it.todo('duration.toString');
+  it.todo('duration.toJSON');
+  it.todo('duration.floor');
+  it.todo('duration.round');
+  it.todo('duration.ceil');
+
 });

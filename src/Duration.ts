@@ -1,4 +1,4 @@
-import { MILLISECONDS_PER_DAY, MILLISECONDS_PER_HOUR, MILLISECONDS_PER_MINUTE, MILLISECONDS_PER_MONTH, MILLISECONDS_PER_WEEK, MILLISECONDS_PER_YEAR } from './Duration.constants';
+import { DAYS_PER_MONTH, DAYS_PER_WEEK, DAYS_PER_YEAR, MILLISECONDS_PER_DAY, MILLISECONDS_PER_HOUR, MILLISECONDS_PER_MINUTE, MILLISECONDS_PER_MONTH, MILLISECONDS_PER_WEEK, MILLISECONDS_PER_YEAR, MONTHS_PER_YEAR, WEEKS_PER_MONTH, WEEKS_PER_YEAR } from './Duration.constants';
 import type { SplitDuration } from './Duration.type';
 import { Instant } from './Instant';
 import { TemporalUnit, TEMPORAL_UNIT_NAME } from './TemporalUnit.constants';
@@ -85,12 +85,12 @@ export class Duration<T extends TemporalUnit = TemporalUnit> {
       return new Duration(TemporalUnit.HOURS, base / MILLISECONDS_PER_HOUR);
     }
     if (base < MILLISECONDS_PER_WEEK) {
-      return new Duration(TemporalUnit.DAYS, base / MILLISECONDS_PER_DAY);
+      return new Duration(TemporalUnit.DAYS, this.days);
     }
     if (base < MILLISECONDS_PER_MONTH) {
-      return new Duration(TemporalUnit.WEEKS, base / MILLISECONDS_PER_WEEK);
+      return new Duration(TemporalUnit.WEEKS, this.weeks);
     }
-    return new Duration(TemporalUnit.YEARS, base / MILLISECONDS_PER_YEAR);
+    return new Duration(TemporalUnit.YEARS, this.years);
   }
 
   split(): SplitDuration {
@@ -209,31 +209,43 @@ export class Duration<T extends TemporalUnit = TemporalUnit> {
   }
 
   get days(): number {
-    if (this.units === TemporalUnit.DAYS) {
-      return this.value;
+    switch (this.units) {
+      case TemporalUnit.DAYS: return this.value;
+      case TemporalUnit.WEEKS: return this.value * DAYS_PER_WEEK;
+      case TemporalUnit.MONTHS: return this.value * DAYS_PER_MONTH;
+      case TemporalUnit.YEARS: return this.value * DAYS_PER_YEAR;
+      default: return this.milliseconds / MILLISECONDS_PER_DAY;
     }
-    return this.milliseconds / MILLISECONDS_PER_DAY;
   }
 
   get weeks(): number {
-    if (this.units === TemporalUnit.WEEKS) {
-      return this.value;
+    switch (this.units) {
+      case TemporalUnit.DAYS: return this.value / DAYS_PER_WEEK;
+      case TemporalUnit.WEEKS: return this.value;
+      case TemporalUnit.MONTHS: return this.value * WEEKS_PER_MONTH;
+      case TemporalUnit.YEARS: return this.value * WEEKS_PER_YEAR;
+      default: return this.milliseconds / MILLISECONDS_PER_WEEK;
     }
-    return this.milliseconds / MILLISECONDS_PER_WEEK;
   }
 
   get months(): number {
-    if (this.units === TemporalUnit.MONTHS) {
-      return this.value;
+    switch (this.units) {
+      case TemporalUnit.DAYS: return this.value / DAYS_PER_MONTH;
+      case TemporalUnit.WEEKS: return this.value / WEEKS_PER_MONTH;
+      case TemporalUnit.MONTHS: return this.value;
+      case TemporalUnit.YEARS: return this.value * 12;
+      default: return this.milliseconds / MILLISECONDS_PER_MONTH;
     }
-    return this.milliseconds / MILLISECONDS_PER_MONTH;
   }
 
   get years(): number {
-    if (this.units === TemporalUnit.YEARS) {
-      return this.value;
+    switch (this.units) {
+      case TemporalUnit.DAYS: return this.value / DAYS_PER_YEAR;
+      case TemporalUnit.WEEKS: return this.value / WEEKS_PER_YEAR;
+      case TemporalUnit.MONTHS: return this.value / MONTHS_PER_YEAR;
+      case TemporalUnit.YEARS: return this.value;
+      default: return this.milliseconds / MILLISECONDS_PER_YEAR;
     }
-    return this.milliseconds / MILLISECONDS_PER_YEAR;
   }
 
   static FromDate(value: Date | string): Duration<TemporalUnit.MILLISECONDS> {
