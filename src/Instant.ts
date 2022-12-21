@@ -69,11 +69,14 @@ export class Instant {
   }
 
   static Now (): Instant {
-    const now = new Date();
+    return this.FromDate(new Date());
+  }
+
+  static FromDate (date: Date): Instant {
     // NOTE +ve timezone has a -ve offset
-    const offset = Duration.Minutes(-now.getTimezoneOffset());
+    const offset = Duration.Minutes(-date.getTimezoneOffset());
     // NOTE time is always UTC
-    const time = now.getTime();
+    const time = date.getTime();
 
     return new Instant(time + offset.milliseconds, offset);
   }
@@ -82,5 +85,60 @@ export class Instant {
     const now = new Date();
     // NOTE +ve timezone has a -ve offset
     return Duration.Minutes(-now.getTimezoneOffset());
+  }
+
+  /**
+   * 2018-04-04T16:00:00.000Z
+   *  2018-04-04T16:00:00.000+02:00
+   *  2018-04-04 16:00
+   * 
+   *  /(\d{4}-\d{2}-\d{2})?( |T\d{2}:\d{2}(?:\{2})/
+   */
+
+  static Parse (value: string): Instant {
+    const date_match = value.match(/^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/);
+
+    const result = {
+      year: 1970, month: 1, day: 1,
+      hour: 0, minute: 0, second: 0, millisecond: 0,
+      offset: 0,
+    };
+
+    if (!date_match?.groups) {
+      throw new Error(`Invalid datetime format "${value}"`);
+    }
+
+    const { year, month, day } = date_match.groups;
+    result.year = +year!;
+    result.month = +month!;
+    result.day = +day!;
+
+    value = value.slice(10);
+
+    const time_match = value.match(/( |T)(?<hour>\d\d):(?<minute>\d\d)(?::(?<second>\d\d)(?:\.(?<millisecond>\d\d\d))?)?(?<offset>Z|\+\d\d:\d\d|-\d\d:\d\d)?$/);
+    
+    if (time_match?.groups) {
+      const { hour, minute, second, millisecond, offset } = time_match.groups;
+
+      result.hour = hour ? + hour : 0;
+      result.minute = minute ? + minute : 0;
+      result.second = second ? + second : 0;
+      result.millisecond = millisecond ? + millisecond : 0;
+      
+      if (offset === 'Z') {
+        result.offset = 0;
+      } else if (offset) {
+        throw new Error(`Unsupported timezone ${offset}`);
+      }
+
+      value = value.slice(time_match[0]?.length);
+    }
+
+    if (value.length > 0) {
+      throw new Error(`Invalid datetime format "${value}"`);
+    }
+
+    const intermediate = new Date(result.year, result.month, result.day, result.hour, result.minute, result.second, result.millisecond);
+    return new Instant(intermediate.getTime(), Duration.Minutes(result.offset));
   }
 }
